@@ -12,10 +12,11 @@ void* myMalloc(size_t inputSize){
   //Check for uninitialized array
   if(myblock[0] == '\0'){
     myblock[0] = inUse;
-    myblock[1] = snprintf(&myblock[1], 4,requestedSize);
-    myblock[2+requestedSize] = notInUse;
-    myblock[2+requestedSize + 1] = BLOCKSIZE - requestedSize;
-    return &myblock[2];
+    //myblock[1] = snprintf(&myblock[1], 4,requestedSize);
+    snprintf(&myblock[1], 4,requestedSize);
+    myblock[5+requestedSize] = notInUse;
+    myblock[5+requestedSize + 1] = BLOCKSIZE - requestedSize;
+    return &myblock[5];
   }
 
   int i =0;
@@ -25,13 +26,14 @@ void* myMalloc(size_t inputSize){
     }
     if(myblock[i] == notInUse && myblock[i+1] >= requestedSize){
       myblock[i] = inUse;
-      myblock[i+2+requestedSize + 1] = itoa( atoi(&myblock[i+1]) - requestedSize );
+      //myblock[i+5+requestedSize + 1] = snprintf(&myblock[i+5+requestedSize + 1],4, atoi(&myblock[i+1]) - requestedSize );
+      snprintf(&myblock[i+5+requestedSize + 1],4, atoi(&myblock[i+1]) - requestedSize );
       myblock[i+1] = itoa(requestedSize);
-      myblock[i+2+requestedSize] = notInUse;
-      return &myblock[i+2];
+      myblock[i+5+requestedSize] = notInUse;
+      return &myblock[i+5];
     }
   }
 }
 int main (int argc, char ** argv){
-  int * x = (int*)myMalloc(sizeof(int)* 5);
+  int * x = (int*)myMalloc(sizeof(int)* 100);
 }
