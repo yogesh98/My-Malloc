@@ -4,6 +4,7 @@
 #define malloc(x) myMalloc(x, __FILE__,__LINE__)
 #define free(x) myFree(x,__FILE_,__LINE__)
 #define BLOCKSIZE 4096
+#define INTSIZE 5
 #define inUse 'y'
 #define notInUse 'n'
 
