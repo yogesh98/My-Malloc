@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define malloc(x) myMalloc(x)
-#define free(x) myFree(x)
-#define true 1
+#define malloc(x) myMalloc(x, __FILE__,__LINE__)
+#define free(x) myFree(x,__FILE_,__LINE__)
+#define BLOCKSIZE 4096
+#define inUse 'y'
+#define notInUse 'n'
+
 //need a library file that uses the header file for functions.
 
-static char myblock[4096];
-int* integers = (integers*) myblock; // used to store integers by bytes along with char
+static char myblock[BLOCKSIZE];
+ // used to store integers by bytes along with char
