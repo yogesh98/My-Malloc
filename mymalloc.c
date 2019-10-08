@@ -4,7 +4,9 @@
 
 //need my free
 //need my myMalloc
-
+void free (void *freeptr){
+  ((char*) freeptr -sizeof(struct metaDeta))->inuse  
+}
 void* myMalloc(size_t inputSize){
 
   int requestedSize = (int) inputSize;

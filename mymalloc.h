@@ -6,7 +6,11 @@
 #define BLOCKSIZE 4096
 #define inUse 'y'
 #define notInUse 'n'
-
+struct metaDeta {
+  int x;
+  inUse;
+}
+ 
 //need a library file that uses the header file for functions.
 
 static char myblock[BLOCKSIZE];
