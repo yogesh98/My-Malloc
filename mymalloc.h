@@ -7,11 +7,11 @@
 #define INTSIZE 5
 #define inUse 'y'
 #define notInUse 'n'
-struct metaDeta {
-  int x;
-  inUse;
-}
- 
+typedef struct metadata {
+  char ussage;
+  short size;
+}metadata;
+
 //need a library file that uses the header file for functions.
 
 static char myblock[BLOCKSIZE];
