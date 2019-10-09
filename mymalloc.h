@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef mymalloc_h_
+#define mymalloc_h_
 
 #define malloc(x) myMalloc(x, __FILE__,__LINE__)
 #define free(x) myFree(x,__FILE_,__LINE__)
@@ -16,3 +16,4 @@ typedef struct metadata {
 
 static char myblock[BLOCKSIZE];
  // used to store integers by bytes along with char
+#endif

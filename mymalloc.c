@@ -10,9 +10,10 @@
 
 //need my free
 //need my myMalloc
-// void free (void *freeptr){
-//   ((char*) freeptr -sizeof(struct metaDeta))->inuse
-// }
+
+
+void* myMalloc(size_t inputSize) {
+//=======
 //ERROR REPORTING:
 //printf("Error on Line %d, in file %s\n", line, file);
 
@@ -27,6 +28,7 @@ char* itoa(char* buffer, int integer){
 }
 
 void* myMalloc(size_t inputSize, char* file , int line){
+
 
   short requestedSize = (short) inputSize;
 
@@ -67,11 +69,12 @@ void* myMalloc(size_t inputSize, char* file , int line){
   return NULL;
 }
 //0 for error 1 for success
-int myFree(void* ptr){
+int myFree(void* ptr,char * file, int line){
   metadata* blockPtr = ptr - sizeof(metadata);
   char* dataPtr = (char*) ptr;
   //printf("ussage: %c\nsize: %d\n", blockPtr->ussage, blockPtr->size);
   if(blockPtr->ussage != inUse){
+    printf("Error: freeing non allocated memory %p from file: %s on line %d has made an error",ptr,file,line);
     return 0;
   }
   else{
@@ -90,37 +93,13 @@ int myFree(void* ptr){
       return 1;
     }
   }
-
-
-
-
-  // char* front = ptr-INTSIZE;
-  // if(*front != inUse){
-  //   return 0;
-  // }
-  // else{
-  //   int size = atoi(ptr-INTSIZE+1);
-  //   //checking if nextblock is also not in use if so combine both and free
-  //   if(front[INTSIZE + size + 1] == notInUse){
-  //     snprintf(&front[1], INTSIZE, "%d", atoi(&front[INTSIZE + size + 2] + size));
-  //     myFree(ptr);
-  //   }
-  //   else{
-  //     int i = 0;
-  //     for(i = 0; i < size; i++){
-  //       front[i] = '\0';
-  //     }
-  //     return 1;
-  //   }
-  // }
-}
-
-void tempPrintMem(){
-  int i = 0;
-  for(i = 0; i<42; i++){
-    //myblock[i] = 0;
-    printf("%d: %c\n" ,i, myblock[i]);
+  //if user tried to free alredy freed memory
+  if (!blockPtr->ussage == inUse){
+    printf("Error: freeing alredy free %p from file: %s on line %d has made an error",ptr,file,line);
+    return 0;
   }
+
+}
 }
 
 int main (int argc, char ** argv){
@@ -150,3 +129,19 @@ int main (int argc, char ** argv){
   myFree(x);
   tempPrintMem();
 }
+/*void myFree (void *freeptr, char * file, int line){
+  void* freemem = (char* (freeptr)) - INTSIZE;
+  char previous = 0;
+  char next = 0;
+
+  freemem = NULL;
+  //if trying to free non allocated memory
+  if ((char*)freemem < myblock || (char*)freemem >= myblock + sizeof(myblock)) {
+    printf("Error: pointer to free %p from file : %s on line %d has made an error\n",freeptr, file,line);
+  }
+  //if user tried to free alredy freed memory
+  if (notInUse){
+    printf("Error: freeing alredy free %p from file: %s on line %d has made an error",freeptr,file,line);
+
+  }
+}*/
