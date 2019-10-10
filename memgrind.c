@@ -8,17 +8,87 @@ void C();
 void D();
 void E();
 void F();
+void breakpoint();
 
 
 int main (int argc, char ** argv){
+
+  // char* a = (char*) malloc(1);
+  // char* b = (char*) malloc(1);
+  // char* c = (char*) malloc(1);
+  // a[0] = 'a';
+  // b[0] = 'b';
+  // c[0] = 'c';
+  // printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(a);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(b);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  //
+  // printf("\n\n\n\n\n");
+  //
+  // a = (char*) malloc(1);
+  // b = (char*) malloc(1);
+  // c = (char*) malloc(1);
+  // a[0] = 'a';
+  // b[0] = 'b';
+  // c[0] = 'c';
+  // printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(b);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(a);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  //
+  // printf("\n\n\n\n\n");
+  //
+  // a = (char*) malloc(1);
+  // b = (char*) malloc(1);
+  // c = (char*) malloc(1);
+  // a[0] = 'a';
+  // b[0] = 'b';
+  // c[0] = 'c';
+  // printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(b);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(c);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  // free(a);
+  // printf("\n\n");
+  // tempPrintMem(0, 15);
+  //
+
   int i = 0;
+  //A();
+  //B();
+  // C();
+  // D();
+  // E();
+  // F();
   for(i = 0; i<100; i++){
     A();
-    // B();
-    // C();
-    // D();
-    // E();
-    // F();
+    B();
+    C();
+    D();
+    E();
+    F();
   }
 }
 
@@ -38,10 +108,10 @@ void B(){
   for(i = 0; i<3; i++){
     char* temp[50];
     for(j = 0; j<50; j++){
-      temp[i] = (char*) malloc(1);
+      temp[j] = (char*) malloc(1);
     }
     for(j = 0; j<50; j++){
-      free(temp[i]);
+      free(temp[j]);
     }
   }
 }
@@ -114,4 +184,8 @@ void E(){
 
 void F(){
 
+}
+void breakpoint(){
+  int i = 0;
+  i++;
 }

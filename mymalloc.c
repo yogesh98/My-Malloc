@@ -54,25 +54,37 @@ int myFree(void* ptr,char * file, int line){
     return 0;
   }
   else{
-    metadata* nextPtr = (metadata*) &blockPtr[sizeof(metadata) + blockPtr->size];
+    blockPtr->ussage = notInUse;
+    //metadata* nextPtr = (metadata*) &blockPtr[sizeof(metadata) + blockPtr->size];
+    char* i;
+    for(i = (char*) blockPtr - 1; i >= &myblock[0]; i--){
+      if(*i == inUse){
+        break;
+      }
+      else if(*i == notInUse){
+        short oldSize = blockPtr->size;
+        blockPtr = (metadata*) i;
+        blockPtr->size = blockPtr->size + oldSize + sizeof(metadata);
+        int deleteLater = sizeof(metadata);
+        dataPtr = (char*) blockPtr + sizeof(metadata);
+        break;
+      }
+    }
+    metadata* nextPtr = dataPtr + blockPtr->size;
     if(nextPtr->ussage == notInUse){
       blockPtr->size = blockPtr->size + nextPtr->size;
-      myFree(blockPtr + sizeof(metadata), __FILE__, __LINE__);
     }
-    else{
-      blockPtr->ussage = notInUse;
-      int i = 0;
-      for(i = 0; i < blockPtr->size; i++){
-        dataPtr[i] = '\0';
-      }
-      //printf("ussage: %c\nsize: %d\n", blockPtr->ussage, blockPtr->size);
-      return 1;
+    int j = 0;
+    for(j = 0; j < blockPtr->size; j++){
+      dataPtr[j] = '\0';
     }
+    //printf("ussage: %c\nsize: %d\n", blockPtr->ussage, blockPtr->size);
+    return 1;
   }
 }
-void tempPrintMem(){
+void tempPrintMem(int start, int end){
    int i = 0;
-   for(i = 0; i<42; i++){
+   for(i = start; i<end; i++){
      //myblock[i] = 0;
      printf("%d: %c\n" ,i, myblock[i]);
    }
