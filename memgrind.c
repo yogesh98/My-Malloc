@@ -86,7 +86,7 @@ int main (int argc, char ** argv){
     A();
     B();
     C();
-    D();
+    //D();
     E();
     F();
   }

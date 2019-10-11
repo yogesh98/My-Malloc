@@ -11,7 +11,8 @@ typedef struct metadata {
   short size;
 }metadata;
 
-//need a library file that uses the header file for functions.
+void* myMalloc(size_t inputSize, char* file , int line);
+int myFree(void* ptr,char * file, int line);
 
 static char myblock[BLOCKSIZE];
  // used to store integers by bytes along with char

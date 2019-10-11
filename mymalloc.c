@@ -70,7 +70,7 @@ int myFree(void* ptr,char * file, int line){
         break;
       }
     }
-    metadata* nextPtr = dataPtr + blockPtr->size;
+    metadata* nextPtr =(metadata*) (dataPtr + blockPtr->size);
     if(nextPtr->ussage == notInUse){
       blockPtr->size = blockPtr->size + nextPtr->size;
     }
@@ -91,30 +91,65 @@ void tempPrintMem(int start, int end){
  }
 
 // int main (int argc, char ** argv){
-//   char* x = (char*)malloc(sizeof(char) *10);
-//   int i = 0;
-//   for(i = 0; i < 10; i++){
-//     x[i] = 'A';
-//     //printf("%c\n", x[i]);
-//   }
+//   char* a = (char*) malloc(1);
+//   char* b = (char*) malloc(1);
+//   char* c = (char*) malloc(1);
+//   a[0] = 'a';
+//   b[0] = 'b';
+//   c[0] = 'c';
+//   printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(a);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(b);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
 //
-//   printf("\n");
-//   char* y = (char*)malloc(sizeof(char)* 10);
-//   for(i = 0; i < 10; i++){
-//     y[i] = 'B';
-//     //printf("%c\n", y[i]);
-//   }
+//   printf("\n\n\n\n\n");
 //
-//   printf("\n");
-//   char* z = (char*)malloc(sizeof(char) *10);
-//   for(i = 0; i < 10; i++){
-//     z[i] = 'C';
-//     //printf("%c\n", x[i]);
-//   }
-//   tempPrintMem();
-//   printf("\n");
+//   a = (char*) malloc(1);
+//   b = (char*) malloc(1);
+//   c = (char*) malloc(1);
+//   a[0] = 'a';
+//   b[0] = 'b';
+//   c[0] = 'c';
+//   printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(b);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(a);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
 //
-//   free(x);
-//   free(x);
-//   tempPrintMem();
+//   printf("\n\n\n\n\n");
+//
+//   a = (char*) malloc(1);
+//   b = (char*) malloc(1);
+//   c = (char*) malloc(1);
+//   a[0] = 'a';
+//   b[0] = 'b';
+//   c[0] = 'c';
+//   printf("a: %p\nb: %p\nc: %p\n", a, b, c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(b);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(c);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//   free(a);
+//   printf("\n\n");
+//   tempPrintMem(0, 15);
+//
 // }
