@@ -76,19 +76,19 @@ int main (int argc, char ** argv){
   //
 
   int i = 0;
-  //A();
-  //B();
+  // A();
+  // B();
   // C();
   // D();
   // E();
   // F();
   for(i = 0; i<100; i++){
-    A();
-    B();
+    // A();
+    // B();
     C();
-    //D();
-    E();
-    F();
+    // D();
+    // E();
+    // F();
   }
 }
 
@@ -122,27 +122,30 @@ void C(){
   // iteration
   // - Keep track of each operation so that you eventually free() all pointers
   // > don't allow a free() if you have no pointers to free()
-  int i;
-  int numAllocations = 0;
-  int indexFreed = 0;
+  FILE* toReproduceErrror = fopen("error", "w+");
   char* malloced[50];
-  while(numAllocations < 50){
-    //if 0 malloc, if 1 free
+  int nextMallocIndex = 0;
+  int nextFreeIndex = 0;
+  while(nextMallocIndex < 50){
     int chooser = rand() % 2;
-
     if(chooser == 0){
-      malloced[numAllocations] = (char*) malloc(1);
-      ++numAllocations;
+      malloced[nextMallocIndex] = (char*) malloc(1);
+      fputs("Malloced\n", toReproduceErrror);
+      nextMallocIndex++;
     }
     else if(chooser == 1){
-      if(numAllocations < indexFreed){
-        free(malloced[indexFreed]);
-        ++indexFreed;
+      if(nextFreeIndex < nextMallocIndex){
+        free(malloced[nextFreeIndex]);
+        fputs("Freed\n", toReproduceErrror);
+        nextFreeIndex++;
       }
     }
   }
-  for(i = indexFreed; i<50; i++){
-    free(malloced[i]);
+  int i;
+  while(nextFreeIndex < 50){
+    free(malloced[nextFreeIndex]);
+    fputs("Freed\n", toReproduceErrror);
+    nextFreeIndex++;
   }
 }
 void D(){
@@ -150,32 +153,8 @@ void D(){
   // - Keep track of each malloc so that all mallocs do not exceed your total memory capacity - Keep track of each operation so that you eventually malloc() 50 times
   // - Keep track of each operation so that you eventually free() all pointers
   // - Choose a random allocation size between 1 and 64 bytes
-  int memoryUsed = 0;
-  int numAllocations = 0;
-  int indexFreed = 0;
-  char* malloced[50];
+  int randRequest = rand() % (64 + 1 - 1) + 1;
 
-  while(numAllocations < 50 && memoryUsed <=4096){
-    //if 0 malloc, if 1 free
-    int chooser = rand() % 2;
-
-    if(chooser == 0){
-      int randRequest = rand() % (64 + 1 - 1) + 1;
-      malloced[numAllocations] = (char*) malloc(randRequest);
-      memoryUsed += (4 + randRequest);
-      ++numAllocations;
-    }
-    else if(chooser == 1){
-      if(numAllocations < indexFreed){
-        free(malloced[indexFreed]);
-        ++indexFreed;
-      }
-    }
-  }
-  int i;
-  for(i = indexFreed; i<50; i++){
-    free(malloced[i]);
-  }
 }
 
 void E(){
