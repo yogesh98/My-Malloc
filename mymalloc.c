@@ -11,7 +11,7 @@ void* myMalloc(size_t inputSize, char* file , int line){
     temp->size = requestedSize;
     metadata* next =(metadata*) &myblock[sizeof(*temp) + requestedSize];
     next->ussage = notInUse;
-    next->size = BLOCKSIZE - requestedSize;
+    next->size = BLOCKSIZE - requestedSize - 2*sizeof(metadata);
     return &myblock[4];
   }
 
@@ -24,18 +24,19 @@ void* myMalloc(size_t inputSize, char* file , int line){
     if(blockPtr->ussage == notInUse && blockPtr->size >= requestedSize){
       blockPtr->ussage = inUse;
       if(myblock[i + sizeof(metadata) + requestedSize] != inUse){
-        metadata* next = (metadata*) &myblock[i + sizeof(metadata) + requestedSize];
+        int nextStarterIndex = i + sizeof(metadata) + requestedSize;
+        metadata* next = (metadata*) &myblock[nextStarterIndex];
         next->ussage = notInUse;
         int j;
-        for(j = i + sizeof(metadata) + requestedSize; j<BLOCKSIZE; j++){
-          if(myblock[i] == inUse){
+        for(j = nextStarterIndex + sizeof(metadata); j<BLOCKSIZE; j++){
+          if(myblock[j] == inUse){
             break;
           }
         }
-        next->size = j - i;
+        next->size = j - nextStarterIndex - sizeof(metadata);
+        int deleteLater = 0;
       }
       blockPtr->size = requestedSize;
-      int deleteLater = sizeof(blockPtr);
       return &myblock[i + sizeof(*blockPtr)];
     }
   }
@@ -72,7 +73,7 @@ int myFree(void* ptr,char * file, int line){
     }
     metadata* nextPtr =(metadata*) (dataPtr + blockPtr->size);
     if(nextPtr->ussage == notInUse){
-      blockPtr->size = blockPtr->size + nextPtr->size;
+      blockPtr->size = blockPtr->size + nextPtr->size + sizeof(metadata);
     }
     int j = 0;
     for(j = 0; j < blockPtr->size; j++){
@@ -83,11 +84,23 @@ int myFree(void* ptr,char * file, int line){
   }
 }
 void tempPrintMem(int start, int end){
-   int i = 0;
-   for(i = start; i<end; i++){
-     //myblock[i] = 0;
-     printf("%d: %c\n" ,i, myblock[i]);
+   // int i = 0;
+   // for(i = start; i<end; i++){
+   //   //myblock[i] = 0;
+   //   printf("%d: %c\n" ,i, myblock[i]);
+   // }
+   metadata* blockPtr;
+   int i;
+   for(i = 0; i<BLOCKSIZE; i += blockPtr->size + sizeof(metadata)){
+     blockPtr = (metadata*) &myblock[i];
+     printf("%d -- U: %c , S: %d, Mem: " , i, blockPtr->ussage, blockPtr->size);
+     int j;
+     for(j = 0; j < blockPtr->size; j++){
+       printf("%c " , myblock[i + sizeof(metadata) + j]);
+     }
+     printf("\n");
    }
+
  }
 
 // int main (int argc, char ** argv){
