@@ -66,7 +66,7 @@ int myFree(void* ptr,char * file, int line){
         blockPtr = (metadata*) i;
         blockPtr->size = blockPtr->size + oldSize + sizeof(metadata);
         int deleteLater = sizeof(metadata);
-        dataPtr = (char*) blockPtr + sizeof(metadata);
+        dataPtr = (char*) blockPtr + sizeof(*blockPtr);
         break;
       }
     }
