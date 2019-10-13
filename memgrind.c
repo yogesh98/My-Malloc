@@ -12,6 +12,7 @@ void breakpoint();
 
 
 int main (int argc, char ** argv){
+  srand(time(NULL));
 
   // char* a = (char*) malloc(1);
   // char* b = (char*) malloc(1);
@@ -62,56 +63,53 @@ int main (int argc, char ** argv){
 
 
 
-  //
-  // char* a = (char*) malloc(1);
-  // a[0] = 'a';
-  // printf("m a\n\n");
+
+  // char* a = (char*) malloc(15);
+  // printf("\n\nm a\n");
   // tempPrintMem(0, 35);
   //
-  // char* b = (char*) malloc(1);
-  // b[0] = 'b';
-  // printf("m b\n\n");
+  // char* b = (char*) malloc(7);
+  // printf("\n\nm b\n");
   // tempPrintMem(0, 35);
   //
-  // free(b);
-  // printf("free b\n\n");
+  // char* c = (char*) malloc(25);
+  // printf("\n\nm c\n");
   // tempPrintMem(0, 35);
   //
-  // char* c = (char*) malloc(1);
-  // c[0] = 'c';
-  // printf("m c\n\n");
+  // free(a);
+  // printf("\n\nf a\n");
   // tempPrintMem(0, 35);
   //
-  // char* d = (char*) malloc(1);
+  // char* d = (char*) malloc(5);
   // d[0] = 'd';
-  // printf("m d\n\n");
+  // printf("\n\nm d\n");
   // tempPrintMem(0, 35);
-  //
+
   // char* e = (char*) malloc(1);
   // e[0] = 'e';
   // printf("m e\n\n");
   // tempPrintMem(0, 35);
-  //
+
   // free(c);
-  // printf("free c\n\n");
+  // printf("\n\nf c\n");
   // tempPrintMem(0, 35);
-  //
+
   // char* f = (char*) malloc(1);
   // f[0] = 'f';
   // printf("m f\n\n");
   // tempPrintMem(0, 35);
-  //
-  // free(a);
-  // printf("f a\n\n");
+
+  // free(b);
+  // printf("\n\nf b\n");
   // tempPrintMem(0, 35);
-  //
+
   // char* g = (char*) malloc(1);
   // g[0] = 'g';
   // printf("m g\n\n");
   // tempPrintMem(0, 35);
-  //
+
   // free(d);
-  // printf("f e\n\n");
+  // printf("\n\nf e\n");
   // tempPrintMem(0, 35);
   // free(e);
   // printf("f f\n\n");
@@ -130,13 +128,13 @@ int main (int argc, char ** argv){
   // B();
   // C();
   // D();
-  E(fopen("error", "r"));
+  // E(fopen("error", "r"));
   // F();
   for(i = 0; i<100; i++){
-    // A();
-    // B();
-    // C();
-    // D();
+    A();
+    B();
+    C();
+    D();
     // E();
     // F();
   }
@@ -161,7 +159,9 @@ void B(){
       temp[j] = (char*) malloc(1);
     }
     for(j = 0; j<50; j++){
-      free(temp[j]);
+      if(free(temp[j]) == 0){
+        //printf("%d\n" , j);
+      }
     }
   }
 }
@@ -178,15 +178,20 @@ void C(){
   int nextFreeIndex = 0;
   while(nextMallocIndex < 50){
     int chooser = rand() % 2;
+    //printf("This is C");
     if(chooser == 0){
       malloced[nextMallocIndex] = (char*) malloc(1);
       fputs("Malloced\n", toReproduceErrror);
+      //printf("\n\nm : %d\n", nextMallocIndex);
+      //tempPrintMem();
       nextMallocIndex++;
     }
     else if(chooser == 1){
       if(nextFreeIndex < nextMallocIndex){
         free(malloced[nextFreeIndex]);
         fputs("Freed\n", toReproduceErrror);
+        //printf("\n\nf : %d\n", nextFreeIndex);
+        //tempPrintMem();
         nextFreeIndex++;
       }
     }
@@ -194,7 +199,10 @@ void C(){
   int i;
   while(nextFreeIndex < 50){
     free(malloced[nextFreeIndex]);
-    fputs("Freed\n", toReproduceErrror);
+    //printf("This is C");
+    //fputs("Freed\n", toReproduceErrror);
+    //printf("\n\nf : %d\n", nextFreeIndex);
+    //tempPrintMem();
     nextFreeIndex++;
   }
 }
@@ -203,33 +211,43 @@ void D(){
   // - Keep track of each malloc so that all mallocs do not exceed your total memory capacity - Keep track of each operation so that you eventually malloc() 50 times
   // - Keep track of each operation so that you eventually free() all pointers
   // - Choose a random allocation size between 1 and 64 bytes
-  int memoryUsed = 0;
-int numAllocations = 0;
-int indexFreed = 0;
-char* malloced[50];
 
-while(numAllocations < 50 && memoryUsed <=4096){
-  //if 0 malloc, if 1 free
-  int chooser = rand() % 2;
-
-  if(chooser == 0){
-    int randRequest = rand() % (64 + 1 - 1) + 1;
-    malloced[numAllocations] = (char*) malloc(randRequest);
-    memoryUsed += (4 + randRequest);
-    ++numAllocations;
-  }
-  else if(chooser == 1){
-    if(numAllocations < indexFreed){
-      free(malloced[indexFreed]);
-      ++indexFreed;
+  FILE* toReproduceErrror = fopen("error", "w+");
+  FILE* randNumbers = fopen("errorNums", "w+");
+  char* malloced[50];
+  int nextMallocIndex = 0;
+  int nextFreeIndex = 0;
+  while(nextMallocIndex < 50){
+    int chooser = rand() % 2;
+    //printf("\nThis is D");
+    if(chooser == 0){
+      int randRequest = rand() % (64 + 1 - 1) + 1;
+      malloced[nextMallocIndex] = (char*) malloc(randRequest);
+      fprintf(randNumbers, "%d\n", randRequest);
+      fputs("Malloced\n", toReproduceErrror);
+      //printf("\n\nm : %d size: %d\n", nextMallocIndex, randRequest);
+      //tempPrintMem();
+      nextMallocIndex++;
+    }
+    else if(chooser == 1){
+      if(nextFreeIndex < nextMallocIndex){
+        free(malloced[nextFreeIndex]);
+        fputs("Freed\n", toReproduceErrror);
+        //printf("\n\nf : %d\n", nextFreeIndex);
+        //tempPrintMem();
+        nextFreeIndex++;
+      }
     }
   }
-}
-int i;
-for(i = indexFreed; i<50; i++){
-  free(malloced[i]);
-}
-
+  int i;
+  while(nextFreeIndex < 50){
+    free(malloced[nextFreeIndex]);
+    fputs("Freed\n", toReproduceErrror);
+    //printf("\nThis is D");
+    //printf("\n\nf : %d\n", nextFreeIndex);
+    //tempPrintMem();
+    nextFreeIndex++;
+  }
 }
 
 void E(FILE* file){
@@ -240,13 +258,16 @@ void E(FILE* file){
   int nextFreeIndex = 0;
   int count = 0;
   FILE* index = fopen("errorIndex", "w+");
+  FILE* randNumbers = fopen("errorNums", "r");
 
   while(!feof(file)){
     getline(&line, &len, file);
     if(line[0] == 'M'){
-      malloced[nextMallocIndex] = (char*) malloc(1);
-      // printf("\nMalloced %d\n" , nextMallocIndex);
-      // tempPrintMem(0, 35);
+      int num;
+      fscanf(randNumbers, "%d", &num);
+      malloced[nextMallocIndex] = (char*) malloc(num);
+      printf("\nMalloced %d\n" , nextMallocIndex);
+      tempPrintMem(0, 35);
       nextMallocIndex++;
     }
     else{
@@ -255,8 +276,8 @@ void E(FILE* file){
             fprintf(index, "%d\n", nextFreeIndex);
         }
         malloced[nextFreeIndex] = NULL;
-        // printf("\nFreed %d\n" , nextFreeIndex);
-        // tempPrintMem(0, 35);
+        printf("\nFreed %d\n" , nextFreeIndex);
+        tempPrintMem(0, 35);
         nextFreeIndex++;
       }
     }

@@ -4,8 +4,8 @@
 #define malloc(x) myMalloc(x, __FILE__,__LINE__)
 #define free(x) myFree(x,__FILE__,__LINE__)
 #define BLOCKSIZE 4096
-#define inUse 'y'
-#define notInUse 'n'
+#define inUse 6
+#define notInUse 21
 typedef struct metadata {
   char ussage;
   short size;
