@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "mymalloc.h"
 
 void A();
@@ -130,29 +131,47 @@ int main (int argc, char ** argv){
   // D();
   // E(fopen("error", "r"));
   // F();
-  for(i = 0; i<100; i++){
+  //for(i = 0; i<100; i++){
     A();
     B();
     C();
     D();
     // E();
     // F();
-  }
+
 }
 
 void A(){
-  // A: malloc() 1 byte and immediately free it - do this 150 times
+  int times;
   int i;
+  // A: malloc() 1 byte and immediately free it - do this 150 times
+double total_time = 0;
+  clock_t start;
+  clock_t end;
+  for (times=0;times<100;times++){
+  start = clock();
   for(i = 0; i<150; i++){
     char* temp = (char*) malloc(sizeof(char));
     free(temp);
   }
+  end = clock();
+  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+}
+    total_time = total_time/100;
+    printf("The average time required to run TestCase A is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
 }
 void B(){
   // B: malloc() 1 byte, store the pointer in an array - do this 150 times.
   // Once you've malloc()ed 50 byte chunks, then free() the 50 1 byte pointers one by one.
+  int times;
+  double total_time = 0;
+  clock_t  start;
+  clock_t end;
+
   int i;
   int j;
+  for(times=0;times<100;times++){
+    start = clock();
   for(i = 0; i<3; i++){
     char* temp[50];
     for(j = 0; j<50; j++){
@@ -164,6 +183,12 @@ void B(){
       }
     }
   }
+  end = clock();
+  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+
+}
+    total_time = total_time/100;
+    printf("The average time required to run TestCase B is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
 }
 void C(){
   // C: Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer > do this until you have allocated 50 times
@@ -176,6 +201,11 @@ void C(){
   char* malloced[50];
   int nextMallocIndex = 0;
   int nextFreeIndex = 0;
+  double total_time =0;
+  clock_t  start,end;
+  int times;
+  for (times=0;times<100;times++){
+    start = clock();
   while(nextMallocIndex < 50){
     int chooser = rand() % 2;
     //printf("This is C");
@@ -205,6 +235,13 @@ void C(){
     //tempPrintMem();
     nextFreeIndex++;
   }
+  end = clock();
+  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+
+}
+total_time = total_time/100;
+printf("The average time required to run TestCase C is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+
 }
 void D(){
   // D: Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
@@ -214,9 +251,14 @@ void D(){
 
   FILE* toReproduceErrror = fopen("error", "w+");
   FILE* randNumbers = fopen("errorNums", "w+");
+  int times;
+  clock_t start,end;
+  double total_time;
   char* malloced[50];
   int nextMallocIndex = 0;
   int nextFreeIndex = 0;
+  for (times=0;times<100;times++){
+    start = clock();
   while(nextMallocIndex < 50){
     int chooser = rand() % 2;
     //printf("\nThis is D");
@@ -248,8 +290,14 @@ void D(){
     //tempPrintMem();
     nextFreeIndex++;
   }
-}
+  end = clock();
+  total_time += (double)(end-start)/CLOCKS_PER_SEC;
 
+}
+total_time = total_time/100;
+printf("The average time required to run TestCase D is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+
+}
 void E(FILE* file){
   char *line = NULL;
   size_t len;
@@ -257,9 +305,13 @@ void E(FILE* file){
   int nextMallocIndex = 0;
   int nextFreeIndex = 0;
   int count = 0;
+  int times;
+  clock_t  start,end;
+  double total_time;
   FILE* index = fopen("errorIndex", "w+");
   FILE* randNumbers = fopen("errorNums", "r");
-
+for(times=0;times<100;times++){
+  start = clock();
   while(!feof(file)){
     getline(&line, &len, file);
     if(line[0] == 'M'){
@@ -283,8 +335,14 @@ void E(FILE* file){
     }
     count++;
   }
-}
+  end = clock();
+  total_time += (double)(end - start)/CLOCKS_PER_SEC;
 
+}
+  total_time = total_time/100;
+  printf("The average time required to run TestCase E is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+
+}
 void F(){
 
 }
