@@ -124,7 +124,7 @@ int main (int argc, char ** argv){
 
 
 
-  int i = 0;
+  //int i = 0;
   // A();
   // B();
   // C();
@@ -136,7 +136,7 @@ int main (int argc, char ** argv){
     B();
     C();
     D();
-    // E();
+    //E();
     // F();
 
 }
@@ -146,6 +146,7 @@ void A(){
   int i;
   // A: malloc() 1 byte and immediately free it - do this 150 times
 double total_time = 0;
+double mean_time =0;
   clock_t start;
   clock_t end;
   for (times=0;times<100;times++){
@@ -155,10 +156,11 @@ double total_time = 0;
     free(temp);
   }
   end = clock();
-  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+  total_time += (double)(end - start);
 }
-    total_time = total_time/100;
-    printf("The average time required to run TestCase A is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+
+    mean_time = total_time/100;
+    printf("The average time required to run TestCase A is: %.2f micro seconds\n",mean_time ); //1000000 for Ghz
 }
 void B(){
   // B: malloc() 1 byte, store the pointer in an array - do this 150 times.
@@ -184,11 +186,11 @@ void B(){
     }
   }
   end = clock();
-  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+  total_time += (double)(end - start);
 
 }
     total_time = total_time/100;
-    printf("The average time required to run TestCase B is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+    printf("The average time required to run TestCase B is: %.2f micro seconds\n",total_time); //1000000 for Ghz
 }
 void C(){
   // C: Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer > do this until you have allocated 50 times
@@ -204,9 +206,10 @@ void C(){
   double total_time =0;
   clock_t  start,end;
   int times;
-  for (times=0;times<100;times++){
-    start = clock();
+  for (times=0;times<10;times++){
+      start = clock();
   while(nextMallocIndex < 50){
+
     int chooser = rand() % 2;
     //printf("This is C");
     if(chooser == 0){
@@ -236,11 +239,11 @@ void C(){
     nextFreeIndex++;
   }
   end = clock();
-  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+  total_time += (double)(end - start);
 
 }
 total_time = total_time/100;
-printf("The average time required to run TestCase C is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+printf("The average time required to run TestCase C is: %.2f micro seconds\n",total_time ); //1000000 for Ghz
 
 }
 void D(){
@@ -291,11 +294,11 @@ void D(){
     nextFreeIndex++;
   }
   end = clock();
-  total_time += (double)(end-start)/CLOCKS_PER_SEC;
+  total_time += (double)(end-start);
 
 }
 total_time = total_time/100;
-printf("The average time required to run TestCase D is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+printf("The average time required to run TestCase D is: %.2f micro seconds\n",total_time ); //1000000 for Ghz
 
 }
 void E(FILE* file){
@@ -336,11 +339,11 @@ for(times=0;times<100;times++){
     count++;
   }
   end = clock();
-  total_time += (double)(end - start)/CLOCKS_PER_SEC;
+  total_time += (double)(end - start);
 
 }
   total_time = total_time/100;
-  printf("The average time required to run TestCase E is: %.2f micro seconds\n",total_time * 1000000); //1000000 for Ghz
+  printf("The average time required to run TestCase E is: %.2f micro seconds\n",total_time); //1000000 for Ghz
 
 }
 void F(){
