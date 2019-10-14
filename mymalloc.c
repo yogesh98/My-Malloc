@@ -4,47 +4,53 @@
 
 void* myMalloc(size_t inputSize, char* file , int line){
   short requestedSize = (short) inputSize;
+
+  if(requestedSize < 0){
+    return NULL;
+  }
   //Check for uninitialized array
   if(myblock[0] == '\0'){
     metadata* temp = (metadata*) &myblock[0];
-    temp->ussage = inUse;
-    temp->size = requestedSize;
-    metadata* next =(metadata*) &myblock[sizeof(*temp) + requestedSize];
-    next->ussage = notInUse;
-    next->size = BLOCKSIZE - requestedSize - 2*sizeof(metadata);
-    return &myblock[4];
+    temp->ussage = notInUse;
+    temp->size = BLOCKSIZE - sizeof(metadata);
   }
+
 
   //loop through and look for smallest block that can fit data to minimize datablocks inbetween
   int i =0;
   metadata* blockPtr = (metadata*) &myblock[i];
+  int smallestPtrIndex;
+  metadata* smallestPtr = NULL;
   for(i = 0; i<BLOCKSIZE; i += blockPtr->size + sizeof(metadata)){
     //printf("%d" , i);
     blockPtr = (metadata*) &myblock[i];
     if(blockPtr->ussage == notInUse && blockPtr->size >= requestedSize){
-      blockPtr->ussage = inUse;
-      if(myblock[i + sizeof(metadata) + requestedSize] != inUse){
-        int nextStarterIndex = i + sizeof(metadata) + requestedSize;
-        metadata* next = (metadata*) &myblock[nextStarterIndex];
-        int j;
-        for(j = nextStarterIndex; j<BLOCKSIZE; j++){
-          if(myblock[j] == inUse){
-            if(j - nextStarterIndex < 4){
-              blockPtr->size = requestedSize + j - nextStarterIndex;
-              return &myblock[i + sizeof(*blockPtr)];
-            }
-            break;
-          }
-        }
-        next->ussage = notInUse;
-        next->size = j - nextStarterIndex - sizeof(metadata);
-        int deleteLater = 0;
+      if(smallestPtr == NULL){
+        smallestPtr = blockPtr;
+        smallestPtrIndex = i;
       }
-      blockPtr->size = requestedSize;
-      return &myblock[i + sizeof(*blockPtr)];
+      else{
+        if(smallestPtr->size > blockPtr->size){
+          smallestPtr = blockPtr;
+          smallestPtrIndex = i;
+        }
+      }
     }
   }
-  return NULL;
+
+  if(smallestPtr == NULL){
+    return NULL;
+  }
+  blockPtr = smallestPtr;
+  blockPtr->ussage = inUse;
+
+  if(blockPtr->size - requestedSize > 4){
+    metadata* nextPtr = (metadata*) &myblock[smallestPtrIndex + requestedSize + sizeof(metadata)];
+    nextPtr->ussage = notInUse;
+    nextPtr->size = blockPtr->size - requestedSize - sizeof(metadata);
+    blockPtr->size = requestedSize;
+  }
+  return &myblock[smallestPtrIndex + sizeof(*blockPtr)];
 }
 
 
@@ -151,9 +157,9 @@ void printMem(int start, int end){
      }
      printf("%d -- U: %c , S: %d, Mem: " , i, ussage, blockPtr->size);
      int j;
-     // for(j = 0; j < blockPtr->size; j++){
-     //   printf("%c " , myblock[i + sizeof(metadata) + j]);
-     // }
+     for(j = 0; j < blockPtr->size; j++){
+       printf("%c " , myblock[i + sizeof(metadata) + j]);
+     }
      printf("\n");
    }
 

@@ -9,12 +9,14 @@ void C();
 void D();
 void E();
 void F();
-int timeToRun(int numTimesToRun, void(*function)());
+void FWithSmallerChunks();
+void reproduceError();
 
 
 int main (int argc, char ** argv){
 
-  srand(time(NULL));
+
+
   int i = 0;
   int numTimesToRun = 100;
   int ATotalTime = 0;
@@ -23,6 +25,7 @@ int main (int argc, char ** argv){
   int DTotalTime = 0;
   int ETotalTime = 0;
   int FTotalTime = 0;
+  int FWithSmallerChunksTotalTime = 0;
   struct timeval start;
   struct timeval end;
 
@@ -64,6 +67,12 @@ int main (int argc, char ** argv){
     gettimeofday(&end,NULL);
     FTotalTime += ((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
   }
+  // for(i = 0; i<numTimesToRun; i++){
+  //   gettimeofday(&start,NULL);
+  //   FWithSmallerChunks();
+  //   gettimeofday(&end,NULL);
+  //   FWithSmallerChunksTotalTime += ((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
+  // }
 
 
   printf("Average Workload Times in milliseconds:\n");
@@ -71,8 +80,9 @@ int main (int argc, char ** argv){
   printf("\tB: %f\n", (BTotalTime/100.0)/1000);
   printf("\tC: %f\n", (CTotalTime/100.0)/1000);
   printf("\tD: %f\n", (DTotalTime/100.0)/1000);
-  printf("\tE: %f\n", (FTotalTime/100.0)/1000);
-  printf("\tF: %f\n", (ETotalTime/100.0)/1000);
+  printf("\tE: %f\n", (ETotalTime/100.0)/1000);
+  printf("\tF: %f\n", (FTotalTime/100.0)/1000);
+  //printf("\tF With Smaller Chunks: %f\n", (FWithSmallerChunksTotalTime/100.0)/1000);
 
 }
 
@@ -108,6 +118,7 @@ void C(){
   // iteration
   // - Keep track of each operation so that you eventually free() all pointers
   // > don't allow a free() if you have no pointers to free()
+  srand(time(NULL));
   char* malloced[50];
   int nextMallocIndex = 0;
   int nextFreeIndex = 0;
@@ -137,19 +148,47 @@ void D(){
   // - Keep track of each operation so that you eventually free() all pointers
   // - Choose a random allocation size between 1 and 64 bytes
 
+
+  // FILE* toReproduceErrror = fopen("error", "w+");
+  // FILE* randNumbers = fopen("errorNums", "w+");
+
+
+  srand(time(NULL));
   char* malloced[50];
   int nextMallocIndex = 0;
   int nextFreeIndex = 0;
+  int memUsed = sizeof(metadata);
   while(nextMallocIndex < 50){
     int chooser = rand() % 2;
     if(chooser == 0){
       int randRequest = rand() % (64 + 1 - 1) + 1;
-      malloced[nextMallocIndex] = (char*) malloc(randRequest);
-      nextMallocIndex++;
+      if(memUsed + randRequest + sizeof(metadata) <= BLOCKSIZE){
+        memUsed += randRequest+sizeof(metadata);
+        malloced[nextMallocIndex] = (char*) malloc(randRequest);
+
+
+        // fprintf(randNumbers, "%d\n", randRequest);
+        // fputs("Malloced\n", toReproduceErrror);
+        // printf("Malloced: %d -- %d\n",nextMallocIndex, randRequest);
+        // printMem();
+
+
+
+        nextMallocIndex++;
+      }
     }
     else if(chooser == 1){
       if(nextFreeIndex < nextMallocIndex){
         free(malloced[nextFreeIndex]);
+
+
+        // fputs("Freed\n", toReproduceErrror);
+        // printf("Feed: %d\n",nextFreeIndex);
+        // printMem();
+
+
+
+
         nextFreeIndex++;
       }
     }
@@ -157,14 +196,138 @@ void D(){
   int i;
   while(nextFreeIndex < 50){
     free(malloced[nextFreeIndex]);
+
+
+    // fputs("Freed\n", toReproduceErrror);
+    // printf("Feed: %d\n",nextFreeIndex);
+    // printMem();
+
+
+
     nextFreeIndex++;
   }
 }
 void E(){
+  //Malloc to capacity then free in random order
+  //in 64 byte chunks
+  srand(time(NULL));
+  char* malloced[4096];
+  char* freedPointer;
+  int nextMallocIndex = 0;
+  int randRequest = 0;
+  int memUsed = 0;
+  while(memUsed < BLOCKSIZE){
+    randRequest = rand() % (64 + 1 - 1) + 1;
+    if(memUsed + randRequest + sizeof(metadata) > BLOCKSIZE ){
+      randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
+    }
+    malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    memUsed += randRequest+sizeof(metadata);
+    nextMallocIndex++;
+  }
 
+  int indexToFree[nextMallocIndex];
+  int i;
+  for(i = 0; i < nextMallocIndex; i++){
+    indexToFree[i] = i;
+  }
+  for(i = nextMallocIndex - 1; i >= 0; i--){
+    int swap = rand() % (i+1);
+    int temp = indexToFree[i];
+    indexToFree[i] = indexToFree[swap];
+    indexToFree[swap] = temp;
+  }
+
+  for(i = 0; i < nextMallocIndex; i++){
+    free(malloced[indexToFree[i]]);
+  }
 }
-void F(){
 
+void F(){
+  //Malloc to Capacity and fill with random data (Since used ascii codes for inuse and notInUse)
+  //Malloc to capacity then free in random order
+  //chunks can be anysize from 1 to 4092
+  srand(time(NULL));
+  char* malloced[4096];
+  char* freedPointer;
+  int nextMallocIndex = 0;
+  int randRequest = 0;
+  int memUsed = 0;
+  while(memUsed < BLOCKSIZE){
+    randRequest = rand() % (4092 + 1 - 1) + 1;
+    if(memUsed + randRequest + sizeof(metadata) > BLOCKSIZE ){
+      randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
+    }
+    malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    int i;
+    for(i = 0; i < randRequest; i++){
+      malloced[nextMallocIndex][i] = rand() % (255 + 1 - 0) + 0;
+    }
+    memUsed += randRequest+sizeof(metadata);
+    nextMallocIndex++;
+  }
+
+  //printMem();
+
+  int indexToFree[nextMallocIndex];
+  int i;
+  for(i = 0; i < nextMallocIndex; i++){
+    indexToFree[i] = i;
+  }
+  for(i = nextMallocIndex - 1; i >= 0; i--){
+    int swap = rand() % (i+1);
+    int temp = indexToFree[i];
+    indexToFree[i] = indexToFree[swap];
+    indexToFree[swap] = temp;
+  }
+
+  for(i = 0; i < nextMallocIndex; i++){
+    free(malloced[indexToFree[i]]);
+  }
+  //printMem();
+}
+void FWithSmallerChunks(){
+  //Malloc to Capacity and fill with random data (Since used ascii codes for inuse and notInUse)
+  //Malloc to capacity then free in random order
+  //chunks can be anysize from 1 to 10
+  srand(time(NULL));
+  char* malloced[4096];
+  char* freedPointer;
+  int nextMallocIndex = 0;
+  int randRequest = 0;
+  int memUsed = 0;
+  while(memUsed < BLOCKSIZE){
+    randRequest = rand() % (10 + 1 - 1) + 1;
+    if(memUsed + randRequest + sizeof(metadata) > BLOCKSIZE ){
+      randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
+    }
+    malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    int i;
+    for(i = 0; i < randRequest; i++){
+      malloced[nextMallocIndex][i] = rand() % (255 + 1 - 0) + 0;
+    }
+    memUsed += randRequest+sizeof(metadata);
+    nextMallocIndex++;
+  }
+
+  //printMem();
+
+  int indexToFree[nextMallocIndex];
+  int i;
+  for(i = 0; i < nextMallocIndex; i++){
+    indexToFree[i] = i;
+  }
+  for(i = nextMallocIndex - 1; i >= 0; i--){
+    int swap = rand() % (i+1);
+    int temp = indexToFree[i];
+    indexToFree[i] = indexToFree[swap];
+    indexToFree[swap] = temp;
+  }
+
+  for(i = 0; i < nextMallocIndex; i++){
+    free(malloced[indexToFree[i]]);
+  }
+  //printMem();
 }
 
 void reproduceError(){
@@ -183,7 +346,7 @@ void reproduceError(){
       int num;
       fscanf(randNumbers, "%d", &num);
       malloced[nextMallocIndex] = (char*) malloc(num);
-      printf("\nMalloced %d\n" , nextMallocIndex);
+      printf("\nMalloced %d -- %d\n" , nextMallocIndex, num);
       printMem(0, 35);
       nextMallocIndex++;
     }
