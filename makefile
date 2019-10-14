@@ -4,4 +4,4 @@ memgrind: mymalloc.o memgrind.c
 mymalloc: mymalloc.c mymalloc.h
 		gcc -c mymalloc.c
 clean:
-	rm a.out; rm mymalloc.o; memgrind
+	rm mymalloc.o; rm memgrind

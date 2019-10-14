@@ -132,7 +132,7 @@ int myFree(void* ptr,char * file, int line){
 //     return 1;
 //   }
 // }
-void tempPrintMem(int start, int end){
+void printMem(int start, int end){
    // int i = 0;
    // for(i = start; i<end; i++){
    //   //myblock[i] = 0;
