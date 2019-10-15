@@ -31,8 +31,6 @@ int main (int argc, char ** argv){
   struct timeval start;
   struct timeval end;
 
-
-
   for(i = 0; i<numTimesToRun; i++){
     gettimeofday(&start,NULL);
     A();
@@ -69,22 +67,22 @@ int main (int argc, char ** argv){
     gettimeofday(&end,NULL);
     FTotalTime += ((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
   }
-  // for(i = 0; i<numTimesToRun; i++){
-  //   gettimeofday(&start,NULL);
-  //   FWithSmallerChunks();
-  //   gettimeofday(&end,NULL);
-  //   FWithSmallerChunksTotalTime += ((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
-  // }
+  for(i = 0; i<numTimesToRun; i++){
+    gettimeofday(&start,NULL);
+    FWithSmallerChunks();
+    gettimeofday(&end,NULL);
+    FWithSmallerChunksTotalTime += ((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
+  }
 
 
   printf("Average Workload Times in milliseconds:\n");
-  printf("\tA: %f\n", (ATotalTime/100.0)/1000);
-  printf("\tB: %f\n", (BTotalTime/100.0)/1000);
-  printf("\tC: %f\n", (CTotalTime/100.0)/1000);
-  printf("\tD: %f\n", (DTotalTime/100.0)/1000);
-  printf("\tE: %f\n", (ETotalTime/100.0)/1000);
-  printf("\tF: %f\n", (FTotalTime/100.0)/1000);
-  //printf("\tF With Smaller Chunks: %f\n", (FWithSmallerChunksTotalTime/100.0)/1000);
+  printf("\tA: %f\n", (ATotalTime/numTimesToRun)/1000.0);
+  printf("\tB: %f\n", (BTotalTime/numTimesToRun)/1000.0);
+  printf("\tC: %f\n", (CTotalTime/numTimesToRun)/1000.0);
+  printf("\tD: %f\n", (DTotalTime/numTimesToRun)/1000.0);
+  printf("\tE: %f\n", (ETotalTime/numTimesToRun)/1000.0);
+  printf("\tF: %f\n", (FTotalTime/numTimesToRun)/1000.0);
+  //printf("\tF With Smaller Chunks: %f\n", (FWithSmallerChunksTotalTime/numTimesToRun)/1000);
 
 }
 
@@ -107,9 +105,7 @@ void B(){
       temp[j] = (char*) malloc(1);
     }
     for(j = 0; j<50; j++){
-      if(free(temp[j]) == 0){
-        //printf("%d\n" , j);
-      }
+      free(temp[j]);
     }
   }
 }
@@ -211,7 +207,10 @@ void D(){
 }
 void E(){
   //Malloc to capacity then free in random order
-  //in 64 byte chunks
+  //in 1-64 byte chunks
+
+
+
   srand(time(NULL));
   char* malloced[4096];
   char* freedPointer;
@@ -224,6 +223,9 @@ void E(){
       randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
     }
     malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    if(malloced[nextMallocIndex] == NULL){
+      break;
+    }
     memUsed += randRequest+sizeof(metadata);
     nextMallocIndex++;
   }
@@ -261,6 +263,9 @@ void F(){
       randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
     }
     malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    if(malloced[nextMallocIndex] == NULL){
+      break;
+    }
     int i;
     for(i = 0; i < randRequest; i++){
       malloced[nextMallocIndex][i] = rand() % (255 + 1 - 0) + 0;
@@ -304,6 +309,9 @@ void FWithSmallerChunks(){
       randRequest = BLOCKSIZE - memUsed - sizeof(metadata);
     }
     malloced[nextMallocIndex] = (char*) malloc(randRequest);
+    if(malloced[nextMallocIndex] == NULL){
+      break;
+    }
     int i;
     for(i = 0; i < randRequest; i++){
       malloced[nextMallocIndex][i] = rand() % (255 + 1 - 0) + 0;

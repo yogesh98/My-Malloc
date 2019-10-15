@@ -6,11 +6,15 @@ For our test plan we created two workloads E() and F().
 
   E() workload randomly Mallocs chunks of 1 to 64 bytes till the capacity of the block is filled.
   while testing this workload we found that our malloc was assigning negative size towards the end
-  of allocation as the metadata size was too large and and will not fit in the block.
+  of allocation as the metadata size was too large and and will not fit in the block. This could cause a
+  segmentation fault if our program was not assigned enough memory to append that metadata and size along
+  the end. This was an easy fix but one that could have caused major problems. In our testing we never 
+  got a segmentation fault because of that but we still fixed the issue to make it safe to use on other machines.
 
-  F() workload randomly Mallcos chunks of size 1 to 4096 bytes and then frees them randomly.
+  F() workload randomly Mallcos chunks of size 1 to 4092 bytes (to account for metadata its not 4096) and then frees them randomly.
   we created a free method at first which used to mess up when it was run with random data so we edited
   the algorithm in a way that free only traverses metadata from beginning to end so that data is never looked into.
-  we left the old free method commented in the malloc library. In order to detect the error we traversed backwards
-  byte by byte assuming it as metadata to find the previously allocated chunk and the data inside it created error
-  which is why we only traversed forward so that only metadata is looked into.
+  we left the old free method commented in the malloc library. In the old free method we traversed backwards
+  byte by byte assuming it as metadata to find the previously allocated chunk and the data inside it created errors
+  if that data was represented in the same way we represented our in use and not in use which is why we only traversed forward
+  so that only metadata is looked into.

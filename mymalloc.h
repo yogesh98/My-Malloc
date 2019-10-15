@@ -9,7 +9,7 @@
 #define inUse 6
 #define notInUse 21
 typedef struct metadata {
-  char ussage;
+  char usage;
   short size;
 }metadata;
 
