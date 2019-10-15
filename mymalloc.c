@@ -40,6 +40,7 @@ void* myMalloc(size_t inputSize, char* file , int line){
     }
   }
   //if nothing is found returns null
+  printf("Error: All Dynamic Memory has been allocated: %s on line %d has made an error\n",ptr,file,line);
   return NULL;
 }
 
